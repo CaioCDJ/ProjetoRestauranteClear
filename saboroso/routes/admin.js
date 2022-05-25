@@ -2,7 +2,7 @@ var express = require('express');
 var users = require('./../inc/users');  
 var router = express.Router();
 
-
+/*
 router.use(function(req,res,next){
 
     if(['/login'].indexOf(req.url) === -1 && !req.session.user)
@@ -10,7 +10,7 @@ router.use(function(req,res,next){
     else
         next();
 });
-
+*/
 router.get('/logout', function(req,res,next){
 
     delete req.session.user;
@@ -70,7 +70,9 @@ router.get('/menus',function(req,res,next){
 });
 router.get('/reservations',function(req,res,next){
 
-    res.render('admin/reservations');
+    res.render('admin/reservations',{
+        date:Date.now()
+    });
 });
 
 router.get('/users',function(req,res,next){
