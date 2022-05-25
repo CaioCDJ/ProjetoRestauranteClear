@@ -1,7 +1,9 @@
 var express = require('express');
+const admin = require('./../inc/admin');
 var users = require('./../inc/users');  
 var router = express.Router();
 
+// -- middlewares --
 /*
 router.use(function(req,res,next){
 
@@ -9,8 +11,17 @@ router.use(function(req,res,next){
         res.redirect('/admin/login');
     else
         next();
+});*/
+
+// exibindo menus lateral
+router.use(function(req,res,next){
+
+    req.menus = admin.getMenus();
+    next();
 });
-*/
+
+// -- routes --
+
 router.get('/logout', function(req,res,next){
 
     delete req.session.user;
@@ -20,26 +31,30 @@ router.get('/logout', function(req,res,next){
 })
 
 router.get('/',function (req,res,next) {
-
-    if(!req.session.views) req.session.views = 0;
-
-    console.log(req.session.views++);
     
-    res.render('admin/index');
+    res.render('admin/index',{
+        menus:req.menus
+    });
 });
 
 router.get('/contacts',function(req,res,next){
 
-    res.render('admin/contacts');
+    res.render('admin/contacts',{
+        menus:req.menus
+    });
 });
 
 router.get('/emails',function(req,res,next){
 
-    res.render('admin/emails');
+    res.render('admin/emails',{
+        menus:req.menus
+    });
 });
 router.get('/login',function(req,res,next){
 
-    users.render(req,res,null);
+    users.render(req,res,null,{
+        menus:req.menus
+    });
 });
 // efetuando login
 router.post('/login',function(req,res,next){
@@ -66,7 +81,9 @@ router.post('/login',function(req,res,next){
 
 router.get('/menus',function(req,res,next){
 
-    res.render('admin/menus');
+    res.render('admin/menus',{
+        menus:req.menus
+    });
 });
 router.get('/reservations',function(req,res,next){
 
