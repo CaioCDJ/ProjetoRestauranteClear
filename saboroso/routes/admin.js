@@ -1,6 +1,8 @@
 var express = require('express');
 const admin = require('./../inc/admin');
 var users = require('./../inc/users');  
+var menus = require("./../inc/menus");
+const e = require('express');
 var router = express.Router();
 
 // -- middlewares --
@@ -12,7 +14,6 @@ router.use(function(req,res,next){
     else
         next();
 
-        console.log(req.session.user);
 });
 
 // exibindo menus lateral
@@ -34,10 +35,13 @@ router.get('/logout', function(req,res,next){
 
 router.get('/',function (req,res,next) {
     
-    res.render('admin/index',{
-        menus:req.menus,
-        user:req.session.user
-    });
+    admin.dashboard().then(data=>{
+        res.render('admin/index',admin.getParams(req,{
+            data
+        }));
+    }).catch(error=>{
+        console.log(error);
+    })
 });
 
 router.get('/contacts',function(req,res,next){
@@ -84,8 +88,28 @@ router.post('/login',function(req,res,next){
 
 router.get('/menus',function(req,res,next){
 
-    res.render('admin/menus',admin.getParams(req));
+    menus.getMenus().then(data=>{
+
+        res.render('admin/menus',admin.getParams(req,{
+            data
+        }));
+
+    })
 });
+
+router.post('/menus', function(req,res,next){
+
+    menus.save(req.fields, req.files).then(results=>{
+
+        res.send(results);
+
+    }).catch(err=>{
+        
+        res.send(err);
+    })
+
+});
+
 router.get('/reservations',function(req,res,next){
 
     res.render('admin/reservations',admin.getParams(req,{

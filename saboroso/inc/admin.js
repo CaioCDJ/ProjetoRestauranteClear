@@ -1,5 +1,34 @@
+var conn = require('./db')
 
 module.exports = {
+
+    dashboard(){
+        
+        return new Promise((resolve, reject )=>{
+
+            conn.query(`
+            
+                SELECT (
+                    select 
+                        count(*) FROM tb_contacts) AS nrcontacts,
+                    (
+                    select 
+                        count(*) FROM tb_menus) AS nrmenus,
+                        (
+                    select 
+                        count(*) FROM tb_reservations) AS nrreservations,
+                        (
+                    select 
+                        count(*) FROM tb_users) AS nrusers;
+            `,(err,results)=>{
+
+                if(err)
+                    reject(err)
+                else
+                    resolve(results[0])
+            });
+        })
+    },
 
     getParams(req,params){
 
