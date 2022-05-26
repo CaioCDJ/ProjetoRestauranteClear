@@ -14,10 +14,11 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
 // config do redis
 app.use(session({
   store: new RedisStore({
-    host:'localhost',
+    host:'127.0.0.1',
     port:'6379'
   }),
   secret:'password',
