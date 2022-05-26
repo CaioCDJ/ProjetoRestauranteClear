@@ -2,7 +2,7 @@ var express = require('express');
 const admin = require('./../inc/admin');
 var users = require('./../inc/users');  
 var menus = require("./../inc/menus");
-const e = require('express');
+var reservations = require('./../inc/reservations');
 var router = express.Router();
 
 // -- middlewares --
@@ -86,6 +86,8 @@ router.post('/login',function(req,res,next){
     }
 });
 
+// -- Menus  --
+
 router.get('/menus',function(req,res,next){
 
     menus.getMenus().then(data=>{
@@ -121,12 +123,43 @@ router.delete('/menus/:id',function(req,res,next){
     })
 })
 
+// -- reservations --
+
 router.get('/reservations',function(req,res,next){
 
-    res.render('admin/reservations',admin.getParams(req,{
-        date:{}
-    }));
+    reservations.getReservations().then(data=>{
+
+        res.render('admin/reservations',admin.getParams(req,{
+            date:{},
+            data
+        }));
+    }) 
 });
+
+router.post('/reservations', function(req,res,next){
+
+    reservations.save(req.fields, req.files).then(results=>{
+
+        res.send(results);
+
+    }).catch(err=>{
+
+        res.send(err);
+    })
+
+});
+
+router.delete('/reservations/:id',function(req,res,next){
+
+    reservations.delete(req.params.id).then(results=>{
+    
+        res.sendFile(results);
+    
+    }).catch(err=>{
+        res.send(err);
+    })
+})
+
 
 router.get('/users',function(req,res,next){
 
