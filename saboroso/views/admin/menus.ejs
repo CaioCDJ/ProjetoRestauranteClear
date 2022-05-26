@@ -62,7 +62,7 @@
     <div class="modal fade" id="modal-create">
       <div class="modal-dialog">
         <div class="modal-content" style="border-top: 3px solid #00a65a;">
-          <form method="post">
+          <form method="post" action="/admin/menus">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -102,7 +102,7 @@
     <div class="modal fade" id="modal-update">
       <div class="modal-dialog">
         <div class="modal-content" style="border-top: 3px solid #00c0ef;">
-          <form method="post">
+          <form method="post"  action="/admin/menus">
             <input type="hidden" name="id">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -142,7 +142,7 @@
 
   
 <%- include('inc/footer.ejs') -%>
-
+<script src="/js/hcode-formsave.js"></script>
 <script src="/js/hcode-filereader.js"></script>
 <script>
 
@@ -150,25 +150,57 @@
   new HcodeFileReader('#modal-create [type=file]','#modal-create img');
   new HcodeFileReader('#modal-update [type=file]','#modal-update img');
 
+
+  // -- Create --
   let formCreate = document.querySelector("#modal-create form");
 
-  formCreate.addEventListener('submit', e=> {
+  formCreate.save().then(json=>{
+    window.location.reload();
+  }).catch(err=>{
 
-    e.preventDefault();
+    console.log(err)
+  });
 
-    let formCreateData = new FormData(formCreate);
 
-    fetch("/admin/menus",{
-      method:"POST",
-      body: formCreateData
-    })
-    .then(response => response.json())
-    .then(json=>{
-      window.location.reload();
-    })
-  })
+//  -- Delete --
+
+  [...document.querySelectorAll('.btn-delete')].forEach(btn=>{
+    
+        
+    btn.addEventListener('click',e=>{
+
+      let tr = e.srcElement.parentElement.parentElement;
+
+      let data = JSON.parse(tr.dataset.row);
+        
+      if(confirm(`Deseja realmente excluir o menu ${data.title}?`)){
+
+        fetch(`/admin/menus/${data.id}`,{
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(json=>{
+          console.log(json);
+          alert(`${data.title} foi excluido.`);
+
+          window.location.reload();
+        })
+      }
+
+    });
+
+    
+  });
+
+  // -- Update --
 
   let formUpdate = document.querySelector('#modal-update form');
+
+  formUpdate.save().then(json=>{
+    window.location.reload();
+  }).catch(err=>{
+    console.log(err)
+  });
 
   // intercrptando evento do bootstrap
   
