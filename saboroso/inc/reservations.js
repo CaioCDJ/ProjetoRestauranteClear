@@ -16,7 +16,6 @@ module.exports ={
     },
 
     save(fields){
-        
         return new Promise((resolve,reject)=>{
 
             if(fields.date.indexOf('/')>-1){
@@ -37,13 +36,13 @@ module.exports ={
             if(parseInt(fields.id)>0){
 
                 query =`
-                    UṔDATE tb_reservations
+                    UPDATE tb_reservations
                     SET 
                         name = ?,
                         email = ?,
                         people = ?,
                         date = ?,
-                        time = ?
+                        time = ? 
                     WHERE id = ?
                 `;
                 params.push(fields.id);
@@ -55,11 +54,11 @@ module.exports ={
             }
 
             conn.query(query,params,(err,results)=>{
-
+                
                 if(err){
-                    reject(err)
+                    reject(err);
                 } else {
-                    resolve(results)
+                    resolve(results);
                 }
             });
         });
@@ -79,5 +78,22 @@ module.exports ={
                     resolve(results);
             });
         });
+    },
+
+    delete(id){
+
+        return new Promise((resolve,reject)=>{
+
+            conn.query(`
+            DELETE FROM tb_reservations WHERE id = ?`,[
+                id
+            ],(err,results)=>{
+                
+                if(err)
+                    reject(err);
+                else
+                    resolve(results);
+            })
+        })
     }
 }

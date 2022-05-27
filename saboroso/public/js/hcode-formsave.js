@@ -10,7 +10,7 @@ HTMLFormElement.prototype.save = function(){
             
             let formData = new FormData(form);
             
-            fetch("/admin/menus",{
+            fetch(form.action,{
             
                 method:form.method,
                 body: formData

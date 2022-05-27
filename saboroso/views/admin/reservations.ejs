@@ -71,9 +71,9 @@
                   <td><%= row.name %></td>
                   <td><%= row.email %></td>
                   <td><%= row.people %></td>
-                  <td><%= row.date%></td>
+                  <td><%= moment(row.date).format('DD [de] MMMM [de] YYYY') %></td>
                   <td><%= row.hour %></td>
-                  <td><button type="button" class="btn btn-xs btn-info btn-update" data-toggle="modal" data-target="#modal-update"><i
+                  <td><button type="button" class="btn btn-xs btn-info btn-update" ><i
                         class="fa fa-pencil"></i> Editar</button>&nbsp;<button type="button" class="btn btn-xs btn-danger btn-delete"><i
                         class="fa fa-trash"></i> Excluir</button></td>
                 </tr>
@@ -152,7 +152,7 @@
     <div class="modal fade" id="modal-update">
       <div class="modal-dialog">
         <div class="modal-content" style="border-top: 3px solid #00c0ef;">
-          <form method="post">
+          <form method="post" action="/admin/reservations">
             <input type="hidden" name="id">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -203,9 +203,10 @@
     
 <%- include('inc/footer.ejs') -%>
 
-
-<script src="/js/hcode/hcode-formsave.js"></script>
+<script src="/js/moment.min.js"></script>
+<script src="/js/hcode-formsave.js"></script>
 <script>
+
   // -- Create --
   let formCreate = document.querySelector("#modal-create form");
 
@@ -232,6 +233,58 @@
     console.log(err)
   });
 
-  
+    [...document.querySelectorAll('.btn-update')].forEach(btn=>{
 
+    btn.addEventListener('click', e=> {
+
+      
+      let tr = e.srcElement.parentElement.parentElement;
+
+      let data = JSON.parse(tr.dataset.row);
+
+      for(let name in data){
+
+        let input = formUpdate.querySelector(`[name=${name}]`);
+
+        switch(name){
+          
+          case 'date':
+            //moment(data[name]).format('YYYY-MM-DD');
+            if(input) input.value = moment(data[name]).format('YYYY-MM-DD');
+          break;
+
+          default:            
+            if(input) input.value = data[name];
+
+        }
+      }
+      $('#modal-update').modal('show'); 
+    });
+  });
+
+  [...document.querySelectorAll('.btn-delete')].forEach(btn=>{
+    
+        
+    btn.addEventListener('click',e=>{
+
+      let tr = e.srcElement.parentElement.parentElement;
+
+      let data = JSON.parse(tr.dataset.row);
+        
+      if(confirm(`Deseja realmente excluir a reserva de ${data.name}?`)){
+
+        fetch(`/admin/reservations/${data.id}`,{
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(json=>{
+          console.log(json);
+          alert(`${data.title} foi excluido.`);
+
+          window.location.reload();
+        })
+      }
+
+    });
+  });
 </script>

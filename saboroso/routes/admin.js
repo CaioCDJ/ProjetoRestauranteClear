@@ -3,7 +3,10 @@ const admin = require('./../inc/admin');
 var users = require('./../inc/users');  
 var menus = require("./../inc/menus");
 var reservations = require('./../inc/reservations');
+var moment = require('moment');
 var router = express.Router();
+
+moment.locale('pt-BR');
 
 // -- middlewares --
 
@@ -131,7 +134,8 @@ router.get('/reservations',function(req,res,next){
 
         res.render('admin/reservations',admin.getParams(req,{
             date:{},
-            data
+            data,
+            moment
         }));
     }) 
 });
