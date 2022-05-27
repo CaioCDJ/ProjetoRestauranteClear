@@ -1,5 +1,5 @@
 
-HTMLFormElement.prototype.save = function(){
+HTMLFormElement.prototype.save = function(config){
 
     return new Promise((resolve,reject)=>{
         let form = this;
@@ -18,9 +18,16 @@ HTMLFormElement.prototype.save = function(){
                 })
             .then(response => response.json())
             .then(json=>{
-                resolve(json)
+
+                if(json.error){
+                    if(typeof config.failure ==="function") config.failure(json.error);
+                }else{
+                    if(typeof config.success ==="function") config.success(json);
+                }
+
             }).catch(err=>{
-                reject(err);
+                if(typeof config.failure ==="function") config.failure(json)
+
             });
         });
     })

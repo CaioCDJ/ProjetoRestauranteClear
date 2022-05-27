@@ -46,6 +46,7 @@ router.get('/',function (req,res,next) {
         console.log(error);
     })
 });
+// -- contacts --
 
 router.get('/contacts',function(req,res,next){
 
@@ -173,7 +174,7 @@ router.get('/users',function(req,res,next){
             data
         }));
 
-        })
+    })
 
 });
 
@@ -186,6 +187,22 @@ router.post('/users',function(req,res,next){
     }).catch(err=>{
 
         res.send(err);
+    })
+});
+
+router.post('/users/passwod-change', function(req,res,next){
+
+    users.changePassword(req).then(results=>{
+        
+        res.send(results);
+    
+    }).catch(err=>{
+
+        console.log(err);
+        res.send({
+            error:err 
+        });
+
     })
 });
 

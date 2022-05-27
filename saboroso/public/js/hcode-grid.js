@@ -29,14 +29,16 @@ class HcodeGrid{
         this.configs = Object.assign({},{
             formCreate:'#modal-create form',
             formUpdate: '#modal-update form' ,
-            btnUpdate: '.btn-update',
-            btnDelete: '.btn-delete', 
+            btnUpdate: 'btn-update',
+            btnDelete: 'btn-delete', 
             onUpdateLoad:(form,name,data)=>{
 
               let input = form.querySelector('[name='+ name+ ']');
               if(input) input.value = data[name];
             }
         }, configs);
+
+        this.rows =[...document.querySelectorAll('table tbody tr')];
 
         this.initButtons();
         this.initForms();
@@ -52,77 +54,96 @@ class HcodeGrid{
 
         this.formCreate = document.querySelector(this.configs.formCreate);
 
-        this.formCreate.save().then(json=>{
-        
+        this.formCreate.save({
+          success:()=>{
           this.fireEvent('afterFormCreate');
-        
-        }).catch(err=>{
+
+          },
+          failure:()=>{
             this.fireEvent('afterFormCreateError');
-        
-        
+
+          }
         });
-    
+
         // -- Update --
         this.formUpdate = document.querySelector(this.configs.formUpdate);
     
-        this.formUpdate.save().then(json=>{
-        
+        this.formUpdate.save({
+          success:()=>{
           this.fireEvent('afterFormUpdate');
-        
-        }).catch(err=>{
-            
+
+          },
+          failure:()=>{
             this.fireEvent('afterFormUpdateError');
-        });
+
+          }
+      });
     }
 
-    initButtons(){
+    btnUpdateClick(e){
 
-        // update
-        [...document.querySelectorAll(this.configs.btnUpdate)].forEach(btn=>{
+      this.fireEvent('beforeUpdateClick',[e])
 
+      let tr = e.srcElement.parentElement.parentElement;
+        
+      let data = JSON.parse(tr.dataset.row);
 
-            btn.addEventListener('click', e=> {
+      for(let name in data){
 
-        
-              let tr = e.srcElement.parentElement.parentElement;
-        
-              let data = JSON.parse(tr.dataset.row);
-        
-              for(let name in data){
-        
-                this.configs.onUpdateLoad(this.formUpdate,name,data);
+        this.configs.onUpdateLoad(this.formUpdate,name,data);
 
-              }
-              setInterval(()=>{
-                this.fireEvent('afterUpdateClick');
-              },100)
-            });
-          });
+      }
+
+      setTimeout(()=>{
+        this.fireEvent('afterUpdateClick');
+      },100);
+
+    }
+
+    btnDeleteClick(e){
+      
+      this.fireEvent('beforeDeleteClick');
+
+      let tr = e.srcElement.parentElement.parentElement;
+
+      let data = JSON.parse(tr.dataset.row);
         
-          // delete
-          [...document.querySelectorAll(this.configs.btnDelete)].forEach(btn=>{
+      if(confirm(eval('`'+this.configs.deleteMsg  +'`') )){
+
+        fetch(eval('`'+this.configs.deleteUrl  +'`') ,{
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(json=>{
+
+            this.fireEvent('afterDeleteClick');
+        });
+    }
+  }
+  
+  initButtons(){
+
+      this.rows.forEach(row=>{
+        
+        [...row.querySelectorAll('.btn')].forEach(btn=>{
+
+          btn.addEventListener('click',e=>{
+
+            if(e.target.classList.contains(this.configs.btnUpdate)){
+
+              this.btnUpdateClick(e);
             
-            btn.addEventListener('click',e=>{
-        
-                this.fireEvent('beforeDeleteClick');
+            }else if(e.target.classList.contains(this.configs.btnDelete)){
+              
+              this.btnDeleteClick(e);
 
-              let tr = e.srcElement.parentElement.parentElement;
-        
-              let data = JSON.parse(tr.dataset.row);
-                
-              if(confirm(eval('`'+this.configs.deleteMsg  +'`') )){
-        
-                fetch(eval('`'+this.configs.deleteUrl  +'`') ,{
-                  method: 'DELETE'
-                })
-                .then(response => response.json())
-                .then(json=>{
+            }else{
 
-                    this.fireEvent('afterDeleteClick');
-                })
-              }
-        
-            });
+              let a =e.srcElement.parentElement.parentElement;
+              this.fireEvent('buttonClick', [e.target,JSON.parse(a.dataset.row), e])
+            }
           });
+        });
+      });
     }
 }
