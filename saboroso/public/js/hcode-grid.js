@@ -4,7 +4,7 @@ class HcodeGrid{
 
         configs.listeners = Object.assign({
             
-            afterUpdateClick:(e)=>{
+            afterUpdateClick: e =>{
                 $('#modal-update').modal('show'); 
             },
             afterDeleteClick:(e)=>{
@@ -31,6 +31,11 @@ class HcodeGrid{
             formUpdate: '#modal-update form' ,
             btnUpdate: '.btn-update',
             btnDelete: '.btn-delete', 
+            onUpdateLoad:(form,name,data)=>{
+
+              let input = form.querySelector('[name='+ name+ ']');
+              if(input) input.value = data[name];
+            }
         }, configs);
 
         this.initButtons();
@@ -78,7 +83,6 @@ class HcodeGrid{
 
             btn.addEventListener('click', e=> {
 
-            this.fireEvent('beforeUpdateClick', [e]);
         
               let tr = e.srcElement.parentElement.parentElement;
         
@@ -86,21 +90,12 @@ class HcodeGrid{
         
               for(let name in data){
         
-                let input = this.formUpdate.querySelector(`[name=${name}]`);
-        
-                switch(name){
-                  
-                  case 'date':
-                    //moment(data[name]).format('YYYY-MM-DD');
-                    if(input) input.value = moment(data[name]).format('YYYY-MM-DD');
-                  break;
-        
-                  default:            
-                    if(input) input.value = data[name];
-        
-                }
+                this.configs.onUpdateLoad(this.formUpdate,name,data);
+
               }
-              this.fireEvent('afterUpdateClick', [e]);
+              setInterval(()=>{
+                this.fireEvent('afterUpdateClick');
+              },100)
             });
           });
         
