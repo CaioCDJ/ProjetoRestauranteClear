@@ -24,3 +24,21 @@
 
 <!-- Main -->
 <script src="js/main.js"></script>
+<script src="/js/hcode-formsave.js"></script>
+
+<script>
+
+    let formSubscribe = document.querySelector('#form-subscribe');
+
+    if(formSubscribe){
+
+        formSubscribe.save({
+            success:()=>{
+                alert('E-mail enviado')
+            },
+            failure(err){
+                alert(err)
+            }
+        })
+    }
+</script>
