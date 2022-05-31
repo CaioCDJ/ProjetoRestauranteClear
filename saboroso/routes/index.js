@@ -6,7 +6,11 @@ var menus = require('./../inc/menus');
 const emails = require('./../inc/emails');
 var router = express.Router();
 
-/* GET home page. */
+
+
+module.exports = function(io){
+
+  /* GET home page. */
 router.get('/', function(req, res, next) {
 
   menus.getMenus().then(results=>{
@@ -41,8 +45,10 @@ router.post('/contacts', function(req,res,next){
     contacts.save(req.body).then(results=>{
       
       req.body ={};
+      io.emit('dashboard update');
+
       contacts.render(req,res,null,'Contato enviado com sucesso');
-    
+
     }).catch(err=>{
       contacts.render(req,res,err.message);
     })
@@ -92,6 +98,8 @@ router.post('/reservations', function (req,res,next){
     reservations.save(req.body).then(results=>{
 
       req.body ={};
+      io.emit('dashboard update');
+
       reservations.render(req,res,null,'Reserva realizada com sucesso')
     
     }).catch(err=>{
@@ -118,10 +126,12 @@ router.post('/subscribe',function(req,res,next){
   emails.save(req).then(results=>{
     console.log(results);
     res.send(results);
+    io.emit('dashboard update');
+
   }).catch(err=>{
     res.send(err);
   })
 
 })
-
-module.exports = router;
+  return router;
+};
